@@ -1,0 +1,12 @@
+//these are just an example and are by no means bulletproof. 
+{
+  "rules": {
+    "iChat": {
+      ".read": "auth !== null",
+    	"$message": {
+        ".write": "auth !== null && newData.child('u').val() === auth.name && (!root.child('iChat').child('bans').child(newData.child('u').val()).exists()) && (!data.exists())",
+        ".validate": "newData.hasChildren(['u','ts','txt'])"
+      }
+    }
+  }
+}
