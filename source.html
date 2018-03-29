@@ -166,7 +166,7 @@
         }
         return result
       })(cleanse(data.txt));
-      message.innerHTML = "[" + prettyTimestamp + '] ' + cleanse(data.u) + ': ' + cleanse(data.txt);
+      message.innerHTML = "[" + prettyTimestamp + '] ' + cleanse(data.u) + ': ' + text;
       if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
         message.classList += "iChat-highlight";
       }
