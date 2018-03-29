@@ -1,61 +1,183 @@
 <!-- This is not a standalone webpage. -->
 <!-- Put this in the <body> tag. Be sure to put the Firebase embed correctly in the <head> tag. -->
 <input id="iChat-input" class="iChat iChat-input">
-	<div id="iChat-messages" class="iChat-messages iChat">
-	</div>
-	<script>
-		var iChat_versionInfo;
-		(function() {
-			fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function(response) {
-			  return response.text();
-			}).then(function(text) {
-					iChat_versionInfo = {version: text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0,-1), releaseDate: text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0,-1)};
-					//Hiding, modifying, or removing the notice (somewhere inside of the line of code below) without explicit approval from the author of the code is strictly prohibited. vv
-					var a=['w6PDtFTCi8O5','woIBbTvDu1w=','wqVowrbDq8K7','w7QtHsODdw==','YsOna1RteCPCnUHCj8OlCsKrw4XCpUnDngpfHsKRwr7CggnDuzLCkA==','fcKYwoEfwqI=','w6TDvsOEw5MuGMK3a8KYKlUHRw==','dcKfwrM=','JQwvd1vCoMKha8OcecKu','wrZlOsO1Qg==','LcOQwr4nw6w='];var b=function(c,d){c=c-0x0;var e=a[c];if(b['LVTMLS']===undefined){(function(){var f=function(){var g;try{g=Function('return\x20(function()\x20'+'{}.constructor(\x22return\x20this\x22)(\x20)'+');')();}catch(h){g=window;}return g;};var i=f();var j='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';i['atob']||(i['atob']=function(k){var l=String(k)['replace'](/=+$/,'');for(var m=0x0,n,o,p=0x0,q='';o=l['charAt'](p++);~o&&(n=m%0x4?n*0x40+o:o,m++%0x4)?q+=String['fromCharCode'](0xff&n>>(-0x2*m&0x6)):0x0){o=j['indexOf'](o);}return q;});}());var r=function(s,t){var u=[],v=0x0,w,x='',y='';s=atob(s);for(var z=0x0,A=s['length'];z<A;z++){y+='%'+('00'+s['charCodeAt'](z)['toString'](0x10))['slice'](-0x2);}s=decodeURIComponent(y);for(var B=0x0;B<0x100;B++){u[B]=B;}for(B=0x0;B<0x100;B++){v=(v+u[B]+t['charCodeAt'](B%t['length']))%0x100;w=u[B];u[B]=u[v];u[v]=w;}B=0x0;v=0x0;for(var C=0x0;C<s['length'];C++){B=(B+0x1)%0x100;v=(v+u[B])%0x100;w=u[B];u[B]=u[v];u[v]=w;x+=String['fromCharCode'](s['charCodeAt'](C)^u[(u[B]+u[v])%0x100]);}return x;};b['Hzxktk']=r;b['LWUVZy']={};b['LVTMLS']=!![];}var D=b['LWUVZy'][c];if(D===undefined){if(b['lBMWGn']===undefined){b['lBMWGn']=!![];}e=b['Hzxktk'](e,d);b['LWUVZy'][c]=e;}else{e=D;}return e;};(e=>{var f={};f[b('0x0','3L6^')]=b('0x1','8X71');f[b('0x2','k)SF')]=function(g,h){return g+h;};f['WuYic']='https://legend-of-iphoenix.github.io/iChat/test.html?';f[b('0x3','GMS4')]=b('0x4','ZUI[');f[b('0x5','s2w$')]=function(i,j,k){return i(j,k);};var l=document[b('0x6','$C)(')](f['kalFe']);l[b('0x7','twVL')]=f['oSNPn'](f['WuYic'],location['href']),document['body'][b('0x8','glzw')](l),console['log'](f[b('0x9','6feW')]),f[b('0xa','JVxy')](setTimeout,m=>l['parentElement']['removeChild'](l),0x1f4);})();
-			});
-			document.getElementById('iChat-input').onkeydown = function(event) {
-				if (event.key == "Enter" || event.keyCode == 13 || event.which == 13) {
-					if (document.getElementById('iChat-input').value.length < 128 && document.getElementById('iChat-input').value.length >= 2) {
-						firebase.database().ref('iChat').push({
-							u: firebase.auth().currentUser.displayName,
-							ts: firebase.database.ServerValue.TIMESTAMP,
-							txt: document.getElementById('iChat-input').value
-						});
-						document.getElementById('iChat-input').value = "";
-					}
-				}
-			}
-			firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added',function(snapshot) {
-				var data = snapshot.val();
-				var prettyTimestamp = (ts => {
-				  var dt = new Date(ts);
-				  var hours = dt.getHours() % 12;
-				  var minutes = dt.getMinutes();
-				  var seconds = dt.getSeconds();
-				  if (hours < 10)
-				    hours = '0' + hours;
+<div id="iChat-messages" class="iChat-messages iChat">
+</div>
+<script>
+  var iChat_versionInfo;
+  (function () {
+    fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      iChat_versionInfo = {
+        version: text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1),
+        releaseDate: text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
+      };
+      //Hiding, modifying, or removing the notice (somewhere inside of the line of code below) without explicit approval from the author of the code is strictly prohibited.
+      var a = ['w6PDtFTCi8O5', 'woIBbTvDu1w=', 'wqVowrbDq8K7', 'w7QtHsODdw==', 'YsOna1RteCPCnUHCj8OlCsKrw4XCpUnDngpfHsKRwr7CggnDuzLCkA==', 'fcKYwoEfwqI=', 'w6TDvsOEw5MuGMK3a8KYKlUHRw==', 'dcKfwrM=', 'JQwvd1vCoMKha8OcecKu', 'wrZlOsO1Qg==', 'LcOQwr4nw6w='];
+      var b = function (c, d) {
+        c = c - 0x0;
+        var e = a[c];
+        if (b['LVTMLS'] === undefined) {
+          (function () {
+            var f = function () {
+              var g;
+              try {
+                g = Function('return\x20(function()\x20' + '{}.constructor(\x22return\x20this\x22)(\x20)' + ');')();
+              } catch (h) {
+                g = window;
+              }
+              return g;
+            };
+            var i = f();
+            var j = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+            i['atob'] || (i['atob'] = function (k) {
+              var l = String(k)['replace'](/=+$/, '');
+              for (var m = 0x0, n, o, p = 0x0, q = ''; o = l['charAt'](p++); ~o && (n = m % 0x4 ? n * 0x40 + o : o, m++ % 0x4) ? q += String['fromCharCode'](0xff & n >> (-0x2 * m & 0x6)) : 0x0) {
+                o = j['indexOf'](o);
+              }
+              return q;
+            });
+          }());
+          var r = function (s, t) {
+            var u = [],
+              v = 0x0,
+              w, x = '',
+              y = '';
+            s = atob(s);
+            for (var z = 0x0, A = s['length']; z < A; z++) {
+              y += '%' + ('00' + s['charCodeAt'](z)['toString'](0x10))['slice'](-0x2);
+            }
+            s = decodeURIComponent(y);
+            for (var B = 0x0; B < 0x100; B++) {
+              u[B] = B;
+            }
+            for (B = 0x0; B < 0x100; B++) {
+              v = (v + u[B] + t['charCodeAt'](B % t['length'])) % 0x100;
+              w = u[B];
+              u[B] = u[v];
+              u[v] = w;
+            }
+            B = 0x0;
+            v = 0x0;
+            for (var C = 0x0; C < s['length']; C++) {
+              B = (B + 0x1) % 0x100;
+              v = (v + u[B]) % 0x100;
+              w = u[B];
+              u[B] = u[v];
+              u[v] = w;
+              x += String['fromCharCode'](s['charCodeAt'](C) ^ u[(u[B] + u[v]) % 0x100]);
+            }
+            return x;
+          };
+          b['Hzxktk'] = r;
+          b['LWUVZy'] = {};
+          b['LVTMLS'] = !![];
+        }
+        var D = b['LWUVZy'][c];
+        if (D === undefined) {
+          if (b['lBMWGn'] === undefined) {
+            b['lBMWGn'] = !![];
+          }
+          e = b['Hzxktk'](e, d);
+          b['LWUVZy'][c] = e;
+        } else {
+          e = D;
+        }
+        return e;
+      };
+      (e => {
+        var f = {};
+        f[b('0x0', '3L6^')] = b('0x1', '8X71');
+        f[b('0x2', 'k)SF')] = function (g, h) {
+          return g + h;
+        };
+        f['WuYic'] = 'https://legend-of-iphoenix.github.io/iChat/test.html?';
+        f[b('0x3', 'GMS4')] = b('0x4', 'ZUI[');
+        f[b('0x5', 's2w$')] = function (i, j, k) {
+          return i(j, k);
+        };
+        var l = document[b('0x6', '$C)(')](f['kalFe']);
+        l[b('0x7', 'twVL')] = f['oSNPn'](f['WuYic'], location['href']), document['body'][b('0x8', 'glzw')](l), console['log'](f[b('0x9', '6feW')]), f[b('0xa', 'JVxy')](setTimeout, m => l['parentElement']['removeChild'](l), 0x1f4);
+      })();
+    });
+    document.getElementById('iChat-input').onkeydown = function (event) {
+      if (event.key == "Enter" || event.keyCode == 13 || event.which == 13) {
+        if (document.getElementById('iChat-input').value.length < 128 && document.getElementById('iChat-input').value.length >= 2) {
+          firebase.database().ref('iChat').push({
+            u: firebase.auth().currentUser.displayName,
+            ts: firebase.database.ServerValue.TIMESTAMP,
+            txt: document.getElementById('iChat-input').value
+          });
+          document.getElementById('iChat-input').value = "";
+        }
+      }
+    }
+    firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function (snapshot) {
+      var data = snapshot.val();
+      var prettyTimestamp = (ts => {
+        var dt = new Date(ts);
+        var hours = dt.getHours() % 12;
+        var minutes = dt.getMinutes();
+        var seconds = dt.getSeconds();
+        if (hours < 10)
+          hours = '0' + hours;
 
-				  if (minutes < 10)
-				    minutes = '0' + minutes;
+        if (minutes < 10)
+          minutes = '0' + minutes;
 
-				  if (seconds < 10)
-				    seconds = '0' + seconds;
+        if (seconds < 10)
+          seconds = '0' + seconds;
 
-				  if (hours == '00')
-				    hours = '12';
+        if (hours == '00')
+          hours = '12';
 
-				  return hours + ":" + minutes + ":" + seconds;
-				})(data.ts);
-			var message = document.createElement('p');
-			message.classList = "iChat iChat-message";
-			message.style.margin = "0";
-			message.innerHTML = "["+prettyTimestamp+'] '+cleanse(data.u)+': '+cleanse(data.txt);
-			document.getElementById("iChat-messages").insertBefore(message, document.getElementById("iChat-messages").childNodes[0]);
-		});
-		function cleanse(text) {
-			var element = document.createElement('p');
-			element.innerText = text;
-			return element.innerHTML
-		}
-	})();
-	</script>
+        return hours + ":" + minutes + ":" + seconds;
+      })(data.ts);
+      var message = document.createElement('p');
+      message.classList = "iChat iChat-message";
+      message.style.margin = "0";
+      var text = (text => {
+        text = text.replace(/\*([^\*]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
+        text = text.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
+        if (text !== undefined && text !== null) {
+          var result = "";
+          var n = "";
+          //I'm using SAX's URL detection regex, because it works.
+          var url_pattern = 'https?:\\/\\/[A-Za-z0-9\\.\\-\\/?&+=;:%#_~]+';
+          var pattern = new RegExp(url_pattern, 'g');
+          var match = text.match(pattern);
+          if (match) {
+            for (var i = 0; i < match.length; i++) {
+              var link = '<a href="' + match[i] + '">' + match[i] + '</a>';
+              var start = text.indexOf(match[i]);
+              var header = text.substring(n.length, start);
+              n += header;
+              n += match[i];
+              result = result.concat(header);
+              result = result.concat(link);
+            }
+            result += text.substring(n.length, text.length);
+          } else {
+            result = text;
+          }
+        } else {
+          result = "";
+        }
+        return result
+      })(cleanse(data.txt));
+      message.innerHTML = "[" + prettyTimestamp + '] ' + cleanse(data.u) + ': ' + cleanse(data.txt);
+      if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
+        message.classList += "iChat-highlight";
+      }
+      document.getElementById("iChat-messages").insertBefore(message, document.getElementById("iChat-messages").childNodes[0]);
+    });
+
+    function cleanse(text) {
+      var element = document.createElement('p');
+      element.innerText = text;
+      return element.innerHTML
+    }
+  })();
+
+</script>
