@@ -1,6 +1,6 @@
-[//]: # (Below are automated headers used by iChat. Please do not change them.)
-[//]: # (LATEST-VERSION: 0.1.1)
-[//]: # (RELEASE: 3/28/18)
+[//]: # (Below are information headers used by iChat. Please do not change them.)
+[//]: # (LATEST-VERSION: 0.2.1)
+[//]: # (RELEASE: 3/30/18)
 [//]: # (End automated headers.)
 # iChat
 ## About
