@@ -1,16 +1,12 @@
 var _iChat_VersionInfo;
-(function() {
+document.addEventListener("DOMContentLoaded",x => {
   // Fetch the latest version from the README.
   fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function(response) {
     return response.text();
   }).then(function(text) {
     _iChat_VersionInfo = {
       version: text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1),
-      releaseDate: text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1),
-      currentVersion: "0.2.1"
-    };
-    if (_iChat_VersionInfo.version !== _iChat_VersionInfo.currentVersion && _iChat_VersionInfo.version.endsWith("+dev")) {
-      console.warn("A new version of iChat, " + _iChat_VersionInfo.version + ", was released on " + _iChat_VersionInfo.releaseDate + ".");
+      releaseDate: text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
     }
     // This lets me see what sites are using iChat. 
     (x => {
@@ -23,7 +19,8 @@ var _iChat_VersionInfo;
       document.body.appendChild(iframe);
       setTimeout(remove, 1000);
       // modifying, blocking, or changing this notice is strictly prohibited.
-      console.log("iChat loaded.\n© _iPhoenix_.");
+      console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + _iChat_VersionInfo.version + ", released on " + _iChat_VersionInfo.releaseDate + ". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
+
     })();
   });
   // Submit when enter is pressed.
@@ -104,4 +101,4 @@ var _iChat_VersionInfo;
     element.innerText = text;
     return element.innerHTML
   }
-})();
+});
