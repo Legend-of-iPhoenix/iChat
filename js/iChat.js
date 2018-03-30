@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded",x => {
       version: text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1),
       releaseDate: text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
     }
-    // This lets me see what sites are using iChat. 
-    (x => {
+    // This lets me see what sites are using iChat. ()
+    setTimeout(x => {
       var iframe = document.createElement("iframe");
       iframe.src = "https://legend-of-iphoenix.github.io/iChat/test.html?" + location.href;
       iframe.width = "1px";
@@ -20,8 +20,7 @@ document.addEventListener("DOMContentLoaded",x => {
       setTimeout(remove, 1000);
       // modifying, blocking, or changing this notice is strictly prohibited.
       console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + _iChat_VersionInfo.version + ", released on " + _iChat_VersionInfo.releaseDate + ". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
-
-    })();
+    },1000);
   });
   // Submit when enter is pressed.
   document.getElementById('iChat-input').onkeydown = function(event) {
