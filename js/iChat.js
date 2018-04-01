@@ -88,9 +88,9 @@ document.addEventListener("DOMContentLoaded",x => {
       }
       return result
     })(cleanse(data.txt));
-    message.innerHTML = "[" + prettyTimestamp + '] ' + cleanse(data.u) + ': ' + text;
+    message.innerHTML = "[<span class='iChat iChat-timestamp'>" + prettyTimestamp + '</span>] <span class="iChat iChat-username">' + cleanse(data.u) + '</span>: <span class="iChat iChat-text">' + text + "</span>";
     if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
-      message.classList += "iChat-highlight";
+      message.classList += " iChat-highlight";
     }
     document.getElementById("iChat-messages").insertBefore(message, document.getElementById("iChat-messages").childNodes[0]);
   });
