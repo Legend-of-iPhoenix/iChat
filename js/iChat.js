@@ -38,26 +38,6 @@ document.addEventListener("DOMContentLoaded",x => {
   // Parse new messages. Most of this code was shamelessly ripped from UniChat.
   firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function(snapshot) {
     var data = snapshot.val();
-    function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
-
-    data.txt = shuffle(data.txt.split(' ')).join(' ');
     var prettyTimestamp = (ts => {
       var date = new Date(ts);
       var hours = date.getHours() % 12;
