@@ -10,6 +10,7 @@ You need to have authentication set up with Firebase in order for this to work. 
 More information in setting it up can be found [here](https://codewalr.us/index.php?topic=2333.msg60803#msg60803).
 
 ## Styling
+---
 Messages are of the format `[timestamp] username: text`.
 ### Format
 - `CSS selector`: description
