@@ -58,25 +58,7 @@ document.addEventListener("DOMContentLoaded",x => {
 }
 
     data.txt = shuffle(data.txt.split(' ')).join(' ');
-    var prettyTimestamp = (ts => {
-      var date = new Date(ts);
-      var hours = date.getHours() % 12;
-      var minutes = date.getMinutes();
-      var seconds = date.getSeconds();
-      if (hours < 10)
-        hours = '0' + hours;
-
-      if (minutes < 10)
-        minutes = '0' + minutes;
-
-      if (seconds < 10)
-        seconds = '0' + seconds;
-
-      if (hours == '00')
-        hours = '12';
-
-      return hours + ":" + minutes + ":" + seconds;
-    })(data.ts);
+    var prettyTimestamp = (new Date(data.ts)).toLocaleTimeString();
     var message = document.createElement('p');
     message.classList = "iChat iChat-message";
     message.style.margin = "0";
