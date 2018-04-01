@@ -13,7 +13,7 @@ More information in setting it up can be found [here](https://codewalr.us/index.
 Messages are of the format `[timestamp] username: text`.
 ### Format
 - `CSS selector`: description
-
+---
 - `.iChat`: Class shared by all elements "owned" by iChat, excluding the script.
 - `.iChat-input`: Input box where messages are entered.
 - `.iChat-messages`: Div containing messages recieved by iChat. It is recommended, but not necessary, to set `overflow: auto;` on this element. 
