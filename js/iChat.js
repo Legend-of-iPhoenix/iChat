@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded",x => {
   // Parse new messages. Most of this code was shamelessly ripped from UniChat.
   firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function(snapshot) {
     var data = snapshot.val();
-    data.txt = shuffle(data.txt.split(' ')).join(' ');
     var prettyTimestamp = (new Date(data.ts)).toLocaleTimeString();
     var message = document.createElement('p');
     message.classList = "iChat iChat-message";
