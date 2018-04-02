@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", x => {
       this.version = null;
       this.isLoaded = false;
       this.plugins = [];
-      this.registerPlugin(plugin) {
+      this.registerPlugin = function(plugin) {
         var parser = plugin.parser;
         if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.isPrototypeOf(iChatParser)) {
           iChat.plugins.push(this)
