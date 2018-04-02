@@ -1,20 +1,30 @@
-var iChat;
-document.addEventListener("DOMContentLoaded",x => {
-  if (iChat === 'undefined') {
-    iChat = new function() {
+var iChat = new function () {
+  this.callbacks = [];
+  this.isTemp = true;
+  Object.defineProperty(this, 'onload', {
+    set(f) {
+      iChat.callbacks.push(f);
+    }
+  });
+};
+document.addEventListener("DOMContentLoaded", x => {
+  if (iChat.isTemp) {
+    var onload = iChat.callbacks;
+    iChat = new function () {
       this.version = null;
       this.isLoaded = false;
       this.plugins = [];
       this.registerPlugin(plugin) {
-        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name)) {
+        var parser = plugin.parser;
+        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.isPrototypeOf(iChatParser)) {
           iChat.plugins.push(this)
         }
       }
-      fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function(response) {
+      fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function (response) {
         return response.text();
-      }).then(function(text) {
+      }).then(function (text) {
         iChat.version = text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1)
-        iChat.releaseDate = text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1) 
+        iChat.releaseDate = text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
         // This lets me see what sites are using iChat. ()
         setTimeout(x => {
           var iframe = document.createElement("iframe");
@@ -28,11 +38,12 @@ document.addEventListener("DOMContentLoaded",x => {
           iChat.isLoaded = true;
           // modifying, blocking, or changing this notice is strictly prohibited.
           console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + iChat.version + ", released on " + iChat.releaseDate + ". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
-        },1000);
+          callbacks.forEach(callback => callback());
+        }, 1000);
       });
     }
     // Submit when enter is pressed.
-    document.getElementById('iChat-input').onkeydown = function(event) {
+    document.getElementById('iChat-input').onkeydown = function (event) {
       if (event.key == "Enter" || event.keyCode == 13 || event.which == 13) {
         if (document.getElementById('iChat-input').value.length < 128 && document.getElementById('iChat-input').value.length >= 2) {
           firebase.database().ref('iChat').push({
@@ -45,7 +56,7 @@ document.addEventListener("DOMContentLoaded",x => {
       }
     }
     // Parse new messages. Most of this code was shamelessly ripped from UniChat.
-    firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function(snapshot) {
+    firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function (snapshot) {
       var data = snapshot.val();
       var prettyTimestamp = (new Date(data.ts)).toLocaleTimeString();
       var message = document.createElement('p');
