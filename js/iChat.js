@@ -28,6 +28,15 @@ document.addEventListener("DOMContentLoaded", x => {
           }
         });
       }
+      Object.defineProperty(this, 'onload', {
+        set(f) {
+          if (iChat.isLoaded) {
+            f();
+          } else {
+            iChat.callbacks.push(f);
+          }
+        }
+      });
       fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function (response) {
         return response.text();
       }).then(function (text) {
