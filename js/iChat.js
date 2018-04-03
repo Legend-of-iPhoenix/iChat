@@ -98,7 +98,8 @@ function iChatPlugin(name, parser, ...otherInfo) {
 }
 
 // load default plugins: links, italics, bold.
-function loadDefaultPlugins() {
+(function () {
+  var desc = "Written by _iPhoenix_, using code from UniChat."
   var links = new iChatPlugin("default/links", function(data) {
     if (data.txt !== undefined && data.txt !== null) {
       var result = "";
@@ -125,18 +126,16 @@ function loadDefaultPlugins() {
     }
     data.txt = result;
     return data;
-  }, "Written by _iPhoenix_, using code from UniChat.");
+  }, desc);
   var italics = new iChatPlugin("default/italics", function(data) {
     data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
     return data;
-  }, "Written by _iPhoenix_, using code from UniChat.");
+  }, desc);
   var bold = new iChatPlugin("default/bold", function(data) {
     data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<em style="display: inline-block;">$1</em>');
     return data;
-  });
+  }, desc);
   iChat.onload = function() {
     iChat.registerPlugins(links, italics, bold);
   }
-}
-
-loadDefaultPlugins();
+})();
