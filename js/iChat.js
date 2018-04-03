@@ -9,16 +9,24 @@ var iChat = new function () {
 };
 document.addEventListener("DOMContentLoaded", x => {
   if (iChat.isTemp) {
-    var onload = iChat.callbacks;
+    var callbacks = iChat.callbacks;
     iChat = new function () {
       this.version = null;
       this.isLoaded = false;
       this.plugins = [];
       this.registerPlugin = function(plugin) {
         var parser = plugin.parser;
-        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.isPrototypeOf(iChatParser)) {
-          iChat.plugins.push(this)
+        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor == iChatPlugin) {
+          iChat.plugins.push(plugin)
         }
+      }
+      this.registerPlugins = function(...plugins) {
+        plugins.forEach(function(plugin) {
+          var parser = plugin.parser;
+          if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor == iChatPlugin) {
+            iChat.plugins.push(plugin)
+          }
+        });
       }
       fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function (response) {
         return response.text();
@@ -58,39 +66,16 @@ document.addEventListener("DOMContentLoaded", x => {
     // Parse new messages. Most of this code was shamelessly ripped from UniChat.
     firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function (snapshot) {
       var data = snapshot.val();
+      data.txt = cleanse(data.txt);
+      data.u = cleanse(data.u);
+      iChat.plugins.forEach(function(plugin) {
+        data = plugin.parser(data);
+      });
       var prettyTimestamp = (new Date(data.ts)).toLocaleTimeString();
       var message = document.createElement('p');
       message.classList = "iChat iChat-message";
       message.style.margin = "0";
-      var text = (text => {
-        text = text.replace(/\*([^\*]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
-        text = text.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
-        if (text !== undefined && text !== null) {
-          var result = "";
-          var n = "";
-          var url_pattern = 'https?:\\/\\/[A-Za-z0-9\\.\\-\\/?&+=;:%#_~]+';
-          var pattern = new RegExp(url_pattern, 'g');
-          var match = text.match(pattern);
-          if (match) {
-            for (var i = 0; i < match.length; i++) {
-              var link = '<a href="' + match[i] + '">' + match[i] + '</a>';
-              var start = text.indexOf(match[i]);
-              var header = text.substring(n.length, start);
-              n += header;
-              n += match[i];
-              result = result.concat(header);
-              result = result.concat(link);
-            }
-            result += text.substring(n.length, text.length);
-          } else {
-            result = text;
-          }
-        } else {
-          result = "";
-        }
-        return result
-      })(cleanse(data.txt));
-      message.innerHTML = "[<span class='iChat iChat-timestamp'>" + prettyTimestamp + '</span>] <span class="iChat iChat-username">' + cleanse(data.u) + '</span>: <span class="iChat iChat-text">' + text + "</span>";
+      message.innerHTML = "[<span class='iChat iChat-timestamp'>" + prettyTimestamp + '</span>] <span class="iChat iChat-username">' + data.u + '</span>: <span class="iChat iChat-text">' + data.txt + "</span>";
       if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
         message.classList += " iChat-highlight";
       }
@@ -106,9 +91,52 @@ document.addEventListener("DOMContentLoaded", x => {
 });
 
 // include a basic way to create iChat plugins.
-// Name = name of plugin, parser = name of 
 function iChatPlugin(name, parser, ...otherInfo) {
   this.name = name;
   this.parser = parser;
   this.otherInfo = otherInfo;
 }
+
+// load default plugins: links, italics, bold.
+function loadDefaultPlugins() {
+  var links = new iChatPlugin("default/links", function(data) {
+    if (data.txt !== undefined && data.txt !== null) {
+      var result = "";
+      var n = "";
+      var url_pattern = 'https?:\\/\\/[A-Za-z0-9\\.\\-\\/?&+=;:%#_~]+';
+      var pattern = new RegExp(url_pattern, 'g');
+      var match = data.txt.match(pattern);
+      if (match) {
+        for (var i = 0; i < match.length; i++) {
+          var link = '<a href="' + match[i] + '">' + match[i] + '</a>';
+          var start = data.txt.indexOf(match[i]);
+          var header = data.txt.substring(n.length, start);
+          n += header;
+          n += match[i];
+          result = result.concat(header);
+          result = result.concat(link);
+        }
+        result += data.txt.substring(n.length, data.txt.length);
+      } else {
+        result = data.txt;
+      }
+    } else {
+      result = "";
+    }
+    data.txt = result;
+    return data;
+  }, "Written by _iPhoenix_, using code from UniChat.");
+  var italics = new iChatPlugin("default/italics", function(data) {
+    data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
+    return data;
+  }, "Written by _iPhoenix_, using code from UniChat.");
+  var bold = new iChatPlugin("default/bold", function(data) {
+    data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<em style="display: inline-block;">$1</em>');
+    return data;
+  });
+  iChat.onload = function() {
+    iChat.registerPlugins(links, italics, bold);
+  }
+}
+
+loadDefaultPlugins();
