@@ -132,7 +132,7 @@ function iChatPlugin(name, parser, ...otherInfo) {
     return data;
   }, desc);
   var bold = new iChatPlugin("default/bold", function(data) {
-    data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<em style="display: inline-block;">$1</em>');
+    data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
   }, desc);
   iChat.onload = function() {
