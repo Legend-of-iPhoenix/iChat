@@ -19,7 +19,7 @@ iChat messages are handled like this:
 ## Creating a plugin
 You can create a new plugin by creating a new iChatPlugin object:
 
-`var myPlugin = new iChatPlugin(name, parser, [other information]);`
+`var myPlugin = new iChatPlugin(name, parser[, other information]);`
 
 You need to provide some basic data for your plugin: a unique plugin name (plugins cannot share names), a parser, which is the function called by iChat, and (optionally) other information about your plugin.
 
@@ -45,7 +45,7 @@ Also note that the order functions are registered in matters. If `plugin1` was r
 This plugin, `default/bold`, is one of the default plugins that "ships" with iChat. It is very easy to see what is going on.
 ```
 var bold = new iChatPlugin("default/bold", function(data) {
-    data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
+    data.txt = data.txt.replace(/\*(.*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
 }, "Written by _iPhoenix_, using code from UniChat.");
 
@@ -58,3 +58,12 @@ In the first section of code, we are creating the actual plugin itself.
 We initialize a new iChatPlugin object. The name of the plugin is "default/bold", and the parser function does a simple replace action. It replaces things encapsulated by asterisks (\*), and makes them **bold**
 
 The second section takes this plugin and tells iChat to register it as soon as it is loaded. If iChat has already loaded by the time the iChat.onload function was set, then the callback will be executed immediately.
+
+## Naming a plugin
+If multiple plugins are being created together, it may make sense to group them together.
+
+It is recommended to name plugins in the format `group_name/plugin_name`.
+
+- Plugin names should be short. Try not to create absurdly long names.
+- If your plugin does not come in a group, the name of the plugin should just be `plugin_name`.
+- Plugin names must be unique.

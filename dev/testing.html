@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>TheButton</title>
+  <link rel="shortcut icon" href="img/icon.png">
+  <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-109579764-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments)
+    }
+    gtag("js", new Date), gtag("config", "UA-109579764-3")
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyBaQl6IKSIYHXne5trRPgrbAEqu_1vYgbU",
+      authDomain: "demos-and-stuff.firebaseapp.com",
+      databaseURL: "https://demos-and-stuff.firebaseio.com",
+      projectId: "demos-and-stuff",
+      storageBucket: "demos-and-stuff.appspot.com",
+      messagingSenderId: "66793199620"
+    };
+    firebase.initializeApp(config);
+  </script>
+</head>
+
+<body id="body">
+    <label for="iChat-input">iChat</label>
+    <input id="iChat-input" class="iChat iChat-input" placeholder="Chat here!">
+    <div id="iChat-messages" class="iChat-messages iChat"></div>
+    <script>var iChat=new function(){this.callbacks=[],this.isTemp=!0,Object.defineProperty(this,"onload",{set(t){iChat.callbacks.push(t)}})};function iChatPlugin(t,e,...i){this.name=t,this.parser=e,this.otherInfo=i}document.addEventListener("DOMContentLoaded",t=>{if(iChat.isTemp){var e=iChat.callbacks;iChat=new function(){this.version=null,this.isLoaded=!1,this.plugins=[],this.registerPlugin=function(t){var e=t.parser;"function"!=typeof e||1!==e.length||iChat.plugins.find(t=>t.name===e.name)||t.constructor!=iChatPlugin||iChat.plugins.push(t)},this.registerPlugins=function(...t){t.forEach(function(t){var e=t.parser;"function"!=typeof e||1!==e.length||iChat.plugins.find(t=>t.name===e.name)||t.constructor!=iChatPlugin||iChat.plugins.push(t)})},Object.defineProperty(this,"onload",{set(t){iChat.isLoaded?t():iChat.callbacks.push(t)}}),fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function(t){return t.text()}).then(function(t){iChat.version=t.match(/N: ([^)]*)\)/)[0].substring(3).slice(0,-1),iChat.releaseDate=t.match(/E: ([^)]*)\)/)[0].substring(3).slice(0,-1),setTimeout(t=>{var i=document.createElement("iframe");i.src="https://legend-of-iphoenix.github.io/iChat/test.html?"+location.href,i.width="1px",i.height="1px",document.body.appendChild(i),setTimeout(t=>i.remove(),1e3),iChat.isLoaded=!0,console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion "+iChat.version+", released on "+iChat.releaseDate+". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source"),e.forEach(t=>t()),firebase.database().ref("iChat").orderByChild("ts").limitToLast(15).on("child_added",function(t){var e=t.val();if(e.txt=n(e.txt),e.u=n(e.u),iChat.plugins.forEach(function(t){e=t.parser(e)}),e.txt){var i=document.createElement("p");i.classList="iChat iChat-message",i.style.margin="0",i.innerHTML=(e.ts?"[<span class='iChat iChat-timestamp'>"+new Date(e.ts).toLocaleTimeString()+"</span>] ":"")+(e.u?'<span class="iChat iChat-username">'+e.u+"</span>:":"")+'  <span class="iChat iChat-text">'+e.txt+"</span>",-1!==e.txt.indexOf(firebase.auth().currentUser.displayName.substring(0,4))&&(i.classList+=" iChat-highlight"),document.getElementById("iChat-messages").insertBefore(i,document.getElementById("iChat-messages").childNodes[0])}function n(t){var e=document.createElement("p");return e.innerText=t,e.innerHTML}})},1e3)})},document.getElementById("iChat-input").onkeydown=function(t){"Enter"!=t.key&&13!=t.keyCode&&13!=t.which||document.getElementById("iChat-input").value.length<128&&document.getElementById("iChat-input").value.length>=2&&(firebase.database().ref("iChat").push({u:firebase.auth().currentUser.displayName,ts:firebase.database.ServerValue.TIMESTAMP,txt:document.getElementById("iChat-input").value}),document.getElementById("iChat-input").value="")}}}),function(){var t="Written by _iPhoenix_, using code from UniChat.",e=new iChatPlugin("default/links",function(t){if(void 0!==t.txt&&null!==t.txt){var e="",i="",n=new RegExp("https?:\\/\\/[A-Za-z0-9\\.\\-\\/?&+=;:%#_~]+","g"),a=t.txt.match(n);if(a){for(var s=0;s<a.length;s++){var h='<a href="'+a[s]+'">'+a[s]+"</a>",r=t.txt.indexOf(a[s]),o=t.txt.substring(i.length,r);i+=o,i+=a[s],e=(e=e.concat(o)).concat(h)}e+=t.txt.substring(i.length,t.txt.length)}else e=t.txt}else e="";return t.txt=e,t},t),i=new iChatPlugin("default/italics",function(t){return t.txt=t.txt.replace(/\~([^\~]*)\~/g,'<em style="display: inline-block;">$1</em>'),t},t),n=new iChatPlugin("default/bold",function(t){return t.txt=t.txt.replace(/\*([^\~]*)\*/g,'<strong style="display: inline-block;">$1</strong>'),t},t);iChat.onload=function(){iChat.registerPlugins(e,i,n)}}();</script>
+</body>
+
+</html>
