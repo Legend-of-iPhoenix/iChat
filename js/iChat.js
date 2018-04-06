@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", x => {
         });
       }
       Object.defineProperty(this, 'onload', {
-        set(f) {
+        set(callback) {
           if (iChat.isLoaded) {
-            f();
+            callback();
           } else {
-            iChat.callbacks.push(f);
+            iChat.callbacks.push(callback);
           }
         }
       });
@@ -48,6 +48,8 @@ document.addEventListener("DOMContentLoaded", x => {
           iframe.src = "https://legend-of-iphoenix.github.io/iChat/test.html?" + location.href;
           iframe.width = "1px";
           iframe.height = "1px";
+          iframe.style.border = "none";
+          
           // For some reason, you cannot just call this method in a setTimeout, so we create a dummy function to call it instead.
           var remove = x => iframe.remove();
           document.body.appendChild(iframe);
@@ -94,14 +96,15 @@ document.addEventListener("DOMContentLoaded", x => {
     function cleanse(text) {
       var element = document.createElement('p');
       element.innerText = text;
-      return element.innerHTML
+      return element.innerHTML;
     }
   }
 });
 
 // include a basic way to create iChat plugins.
 function iChatPlugin(name, parser, ...otherInfo) {
-  this.name = name;
+  this.group = name.split("/")[0] !== name ? name.split("/")[0] : undefined;
+  this.name = name.split("/")[0] === name ? name : name.split("/")[1];
   this.parser = parser;
   this.otherInfo = otherInfo;
 }
@@ -137,11 +140,11 @@ function iChatPlugin(name, parser, ...otherInfo) {
     return data;
   }, desc);
   var italics = new iChatPlugin("default/italics", function(data) {
-    data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
+    data.txt = data.txt.replace(/\~(.*)\~/g, '<em style="display: inline-block;">$1</em>');
     return data;
   }, desc);
   var bold = new iChatPlugin("default/bold", function(data) {
-    data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
+    data.txt = data.txt.replace(/\*(.*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
   }, desc);
   iChat.onload = function() {
