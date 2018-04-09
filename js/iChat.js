@@ -1,6 +1,6 @@
 var iChat = new function () {
   this.callbacks = [];
-  this.isTemp = true;
+  this.isLoaded = false;
   Object.defineProperty(this, 'onload', {
     set(f) {
       iChat.callbacks.push(f);
@@ -8,7 +8,7 @@ var iChat = new function () {
   });
 };
 document.addEventListener("DOMContentLoaded", x => {
-  if (iChat.isTemp) {
+  if (!iChat.isLoaded) {
     var callbacks = iChat.callbacks;
     iChat = new function () {
       this.version = null;
@@ -16,24 +16,36 @@ document.addEventListener("DOMContentLoaded", x => {
       this.plugins = [];
       this.registerPlugin = function(plugin) {
         var parser = plugin.parser;
-        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor == iChatPlugin) {
+        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor === iChatPlugin) {
           iChat.plugins.push(plugin)
         }
       }
       this.registerPlugins = function(...plugins) {
         plugins.forEach(function(plugin) {
           var parser = plugin.parser;
-          if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor == iChatPlugin) {
+          if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor === iChatPlugin) {
             iChat.plugins.push(plugin)
           }
         });
       }
+      this.renderMessage = function(data) {
+        if (data.txt) {
+          var message = document.createElement('p');
+          message.classList = "iChat iChat-message";
+          message.style.margin = "0";
+          message.innerHTML = (data.ts ? "[<span class='iChat iChat-timestamp'>" + new Date(data.ts).toLocaleTimeString() + '</span>] ' : '') + (data.u ? '<span class="iChat iChat-username">' + data.u + '</span>:': '') + '  <span class="iChat iChat-text">' + data.txt + "</span>";
+          if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
+            message.classList += " iChat-highlight";
+          }
+          document.getElementById("iChat-messages").insertBefore(message, document.getElementById("iChat-messages").childNodes[0]);
+        }
+      }
       Object.defineProperty(this, 'onload', {
-        set(callback) {
+        set(f) {
           if (iChat.isLoaded) {
-            callback();
+            f();
           } else {
-            iChat.callbacks.push(callback);
+            iChat.callbacks.push(f);
           }
         }
       });
@@ -42,14 +54,12 @@ document.addEventListener("DOMContentLoaded", x => {
       }).then(function (text) {
         iChat.version = text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1)
         iChat.releaseDate = text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
-        // This lets me see what sites are using iChat. ()
+        // This lets me see what sites are using iChat.
         setTimeout(x => {
           var iframe = document.createElement("iframe");
           iframe.src = "https://legend-of-iphoenix.github.io/iChat/test.html?" + location.href;
           iframe.width = "1px";
           iframe.height = "1px";
-          iframe.style.border = "none";
-          
           // For some reason, you cannot just call this method in a setTimeout, so we create a dummy function to call it instead.
           var remove = x => iframe.remove();
           document.body.appendChild(iframe);
@@ -58,6 +68,22 @@ document.addEventListener("DOMContentLoaded", x => {
           // modifying, blocking, or changing this notice is strictly prohibited.
           console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + iChat.version + ", released on " + iChat.releaseDate + ". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
           callbacks.forEach(callback => callback());
+          // Parse new messages. Most of this code was shamelessly ripped from UniChat.
+          firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function (snapshot) {
+            var data = snapshot.val();
+            data.txt = cleanse(data.txt);
+            data.u = cleanse(data.u);
+            iChat.plugins.forEach(function(plugin) {
+              data = plugin.parser(data);
+            });
+            iChat.renderMessage(data);
+            // Cleanses user input, so that HTML tags and whatnot cannot be injected.
+            function cleanse(text) {
+              var element = document.createElement('p');
+              element.innerText = text;
+              return element.innerHTML
+            }
+          });
         }, 1000);
       });
     }
@@ -74,37 +100,12 @@ document.addEventListener("DOMContentLoaded", x => {
         }
       }
     }
-    // Parse new messages. Most of this code was shamelessly ripped from UniChat.
-    firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function (snapshot) {
-      var data = snapshot.val();
-      data.txt = cleanse(data.txt);
-      data.u = cleanse(data.u);
-      iChat.plugins.forEach(function(plugin) {
-        data = plugin.parser(data);
-      });
-      var prettyTimestamp = (new Date(data.ts)).toLocaleTimeString();
-      var message = document.createElement('p');
-      message.classList = "iChat iChat-message";
-      message.style.margin = "0";
-      message.innerHTML = "[<span class='iChat iChat-timestamp'>" + prettyTimestamp + '</span>] <span class="iChat iChat-username">' + data.u + '</span>: <span class="iChat iChat-text">' + data.txt + "</span>";
-      if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
-        message.classList += " iChat-highlight";
-      }
-      document.getElementById("iChat-messages").insertBefore(message, document.getElementById("iChat-messages").childNodes[0]);
-    });
-    // Cleanses user input, so that HTML tags and whatnot cannot be injected.
-    function cleanse(text) {
-      var element = document.createElement('p');
-      element.innerText = text;
-      return element.innerHTML;
-    }
   }
 });
 
 // include a basic way to create iChat plugins.
 function iChatPlugin(name, parser, ...otherInfo) {
-  this.group = name.split("/")[0] !== name ? name.split("/")[0] : undefined;
-  this.name = name.split("/")[0] === name ? name : name.split("/")[1];
+  this.name = name;
   this.parser = parser;
   this.otherInfo = otherInfo;
 }
@@ -140,11 +141,11 @@ function iChatPlugin(name, parser, ...otherInfo) {
     return data;
   }, desc);
   var italics = new iChatPlugin("default/italics", function(data) {
-    data.txt = data.txt.replace(/\~(.*)\~/g, '<em style="display: inline-block;">$1</em>');
+    data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
     return data;
   }, desc);
   var bold = new iChatPlugin("default/bold", function(data) {
-    data.txt = data.txt.replace(/\*(.*)\*/g, '<strong style="display: inline-block;">$1</strong>');
+    data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
   }, desc);
   iChat.onload = function() {
