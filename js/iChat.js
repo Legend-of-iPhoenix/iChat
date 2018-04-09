@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", x => {
           }
         }
       });
+      // Fetch versioning information. I'm hiding it in the top of the readme file. I should probably give it its own file.
       fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function (response) {
         return response.text();
       }).then(function (text) {
