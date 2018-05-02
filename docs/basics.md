@@ -6,3 +6,6 @@ iChat messages are split into 3 parts: the timestamp, the username, and the text
 
 ## Sending a Message
 To send a message, you type the message into the input bar. Pressing enter sends the message, if the message meets certain requirements. (i.e. not too long, not too short, user is not banned, etc)
+
+## Banning Users
+If you are using the default firebase rules, you can ban a user by adding their username to the keys in `/iChat/banned/`.
