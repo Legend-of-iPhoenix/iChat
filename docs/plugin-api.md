@@ -7,7 +7,7 @@ The Plugin API gives you the ability to add features to iChat.
 Plugins are just bits of Javascript, so plugins can be added directly into a JS file or loaded like any other JS plugin, like JQuery or Materialize.
 
 ## How it works
-You can imagine plugins as being a filter between what the user's client recieves and what they see.
+You can imagine plugins as being a filter between what iChat recieves from the database and what the end user sees.
 
 iChat messages are handled like this:
 
