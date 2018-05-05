@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", x => {
         var parser = plugin.parser;
         if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor === iChatPlugin) {
           iChat.plugins.push(plugin)
-        }
+        } // todo: create error message on plugin failure.
       }
       this.registerPlugins = function(...plugins) {
         plugins.forEach(function(plugin) {
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", x => {
           }
         });
       }
+      // renders messages, regardless of whether they were actually sent by a user or not. Plugins can call this function to "send" messages.
       this.renderMessage = function(data) {
         if (data.txt) {
           var message = document.createElement('p');
@@ -55,8 +56,8 @@ document.addEventListener("DOMContentLoaded", x => {
       }).then(function (text) {
         iChat.version = text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1)
         iChat.releaseDate = text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
-        // This lets me see what sites are using iChat.
         setTimeout(x => {
+          // This lets me see what sites are using iChat.
           var iframe = document.createElement("iframe");
           iframe.src = "https://legend-of-iphoenix.github.io/iChat/test.html?" + location.href;
           iframe.width = "1px";
@@ -65,6 +66,7 @@ document.addEventListener("DOMContentLoaded", x => {
           var remove = x => iframe.remove();
           document.body.appendChild(iframe);
           setTimeout(remove, 1000);
+
           iChat.isLoaded = true;
           // modifying, blocking, or changing this notice is strictly prohibited.
           console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + iChat.version + ", released on " + iChat.releaseDate + ". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
@@ -78,7 +80,7 @@ document.addEventListener("DOMContentLoaded", x => {
               data = plugin.parser(data);
             });
             iChat.renderMessage(data);
-            // Cleanses user input, so that HTML tags and whatnot cannot be injected.
+            // Cleanses user input, so that HTML tags and whatnot cannot be injected. This is my go-to function for message cleansing.
             function cleanse(text) {
               var element = document.createElement('p');
               element.innerText = text;
@@ -104,7 +106,7 @@ document.addEventListener("DOMContentLoaded", x => {
   }
 });
 
-// include a basic way to create iChat plugins.
+// include a way to create iChat plugins.
 function iChatPlugin(name, parser, ...otherInfo) {
   this.name = name;
   this.parser = parser;
@@ -114,11 +116,12 @@ function iChatPlugin(name, parser, ...otherInfo) {
 // load default plugins: links, italics, bold.
 (function () {
   var desc = "Written by _iPhoenix_, using code from UniChat."
+  // renders links.
   var links = new iChatPlugin("default/links", function(data) {
     if (data.txt !== undefined && data.txt !== null) {
       var result = "";
       var n = "";
-      var url_pattern = 'https?:\\/\\/[A-Za-z0-9\\.\\-\\/?&+=;:%#_~]+';
+      var url_pattern = 'https?:\\/\\/[A-Za-z0-9\\.\\-\\/?&+=;:%#_~]+'; // RegEx shamelessly ripped from SAX, an unrelated chatting script used by the Cemetech programming community at https://cemetech.net
       var pattern = new RegExp(url_pattern, 'g');
       var match = data.txt.match(pattern);
       if (match) {
