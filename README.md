@@ -1,7 +1,3 @@
-[//]: # (Below are information headers used by iChat. Please do not change them.)
-[//]: # (LATEST-VERSION: 0.5.0)
-[//]: # (RELEASE: 04/09/18)
-[//]: # (End automated headers.)
 # iChat
 ## About
 iChat is a customizable chatting service based off of Google Firebase. All you have to do is embed the line of HTML (found in `embed.html`) into your HTML file, add the Firebase rules snippet (`database-rules.json`), and (optionally) provide some styling.

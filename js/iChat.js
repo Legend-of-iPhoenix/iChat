@@ -4,9 +4,13 @@ var iChat = new function () {
   Object.defineProperty(this, 'onload', {
     set(f) {
       iChat.callbacks.push(f);
+    },
+    get() {
+      return iChat.callbacks;
     }
   });
 };
+
 document.addEventListener("DOMContentLoaded", x => {
   if (!iChat.isLoaded) {
     var callbacks = iChat.callbacks;
@@ -14,27 +18,33 @@ document.addEventListener("DOMContentLoaded", x => {
       this.version = null;
       this.isLoaded = false;
       this.plugins = [];
-      this.registerPlugin = function(plugin) {
-        var parser = plugin.parser;
-        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor === iChatPlugin) {
+      this.registerPlugin = function (plugin) {
+        var parser = plugin.parser; 
+        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(otherPlugin => otherPlugin.name === plugin.name) && plugin.constructor === iChatPlugin) { // assert that the plugin has a parser that is a function that takes one argument, has a unique name, and was made using the iChatPlugin constructor.
           iChat.plugins.push(plugin)
         } // todo: create error message on plugin failure.
       }
-      this.registerPlugins = function(...plugins) {
-        plugins.forEach(function(plugin) {
+      this.registerPlugins = function (...plugins) {
+        plugins.forEach(function (plugin) {
           var parser = plugin.parser;
-          if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(plugin => plugin.name === parser.name) && plugin.constructor === iChatPlugin) {
+          if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(otherPlugin => otherPlugin.name === plugin.name) && plugin.constructor === iChatPlugin) { // assert that the plugin has a parser that is a function that takes one argument, has a unique name, and was made using the iChatPlugin constructor.
             iChat.plugins.push(plugin)
-          }
+          } // todo: create error message on plugin failure.
         });
       }
+      // removes the plugin with a given name, returning the plugin that was removed.
+      this.removePlugin = function(name) {
+        var removedPlugin = iChat.plugins.find(plugin => plugin.name == name);
+        iChat.plugins = iChat.plugins.filter(plugin => plugin.name != name);
+        return removedPlugin;
+      }
       // renders messages, regardless of whether they were actually sent by a user or not. Plugins can call this function to "send" messages.
-      this.renderMessage = function(data) {
+      this.renderMessage = function (data) {
         if (data.txt) {
           var message = document.createElement('p');
           message.classList = "iChat iChat-message";
           message.style.margin = "0";
-          message.innerHTML = (data.ts ? "[<span class='iChat iChat-timestamp'>" + new Date(data.ts).toLocaleTimeString() + '</span>] ' : '') + (data.u ? '<span class="iChat iChat-username">' + data.u + '</span>:': '') + '  <span class="iChat iChat-text">' + data.txt + "</span>";
+          message.innerHTML = (data.ts ? "[<span class='iChat iChat-timestamp'>" + new Date(data.ts).toLocaleTimeString() + '</span>] ' : '') + (data.u ? '<span class="iChat iChat-username">' + data.u + '</span>:' : '') + '  <span class="iChat iChat-text">' + data.txt + "</span>";
           if (data.txt.indexOf(firebase.auth().currentUser.displayName.substring(0, 4)) !== -1) {
             message.classList += " iChat-highlight";
           }
@@ -50,22 +60,24 @@ document.addEventListener("DOMContentLoaded", x => {
           }
         }
       });
-      // Fetch versioning information. I'm hiding it in the top of the readme file. I should probably give it its own file.
-      fetch("https://legend-of-iphoenix.github.io/iChat/README.md").then(function (response) {
-        return response.text();
-      }).then(function (text) {
-        iChat.version = text.match(/N: ([^)]*)\)/)[0].substring(3).slice(0, -1)
-        iChat.releaseDate = text.match(/E: ([^)]*)\)/)[0].substring(3).slice(0, -1)
+      // Fetch versioning information.
+      fetch("https://legend-of-iphoenix.github.io/iChat/version.json").then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        iChat.version = json.version;
+        iChat.releaseDate = json.releaseDate;
         setTimeout(x => {
           // This lets me see what sites are using iChat.
-          var iframe = document.createElement("iframe");
-          iframe.src = "https://legend-of-iphoenix.github.io/iChat/test.html?" + location.href;
-          iframe.width = "1px";
-          iframe.height = "1px";
-          // For some reason, you cannot just call this method in a setTimeout, so we create a dummy function to call it instead.
-          var remove = x => iframe.remove();
-          document.body.appendChild(iframe);
-          setTimeout(remove, 1000);
+          if ((document.querySelector('script[src$="/iChat/js/iChat.min.js?notracking"]') || document.querySelector('script[src$="/iChat/js/iChat.js?notracking"]')) === null) {
+            var iframe = document.createElement("iframe");
+            iframe.src = "https://legend-of-iphoenix.github.io/iChat/usage.html?" + location.href;
+            iframe.width = "1px";
+            iframe.height = "1px";
+            // For some reason, it doesn't like it if I call this method directly in a setTimeout, so we create a dummy function to call it instead.
+            var remove = x => iframe.remove();
+            document.body.appendChild(iframe);
+            setTimeout(remove, 1000);
+          }
 
           iChat.isLoaded = true;
           // modifying, blocking, or changing this notice is strictly prohibited.
@@ -76,7 +88,7 @@ document.addEventListener("DOMContentLoaded", x => {
             var data = snapshot.val();
             data.txt = cleanse(data.txt);
             data.u = cleanse(data.u);
-            iChat.plugins.forEach(function(plugin) {
+            iChat.plugins.forEach(function (plugin) {
               data = plugin.parser(data);
             });
             iChat.renderMessage(data);
@@ -87,7 +99,7 @@ document.addEventListener("DOMContentLoaded", x => {
               return element.innerHTML
             }
           });
-        }, 1000);
+        }, 500);
       });
     }
     // Submit when enter is pressed.
@@ -114,10 +126,10 @@ function iChatPlugin(name, parser, ...otherInfo) {
 }
 
 // load default plugins: links, italics, bold.
-(function () {
+(() => {
   var desc = "Written by _iPhoenix_, using code from UniChat."
   // renders links.
-  var links = new iChatPlugin("default/links", function(data) {
+  var links = new iChatPlugin("default/links", function (data) {
     if (data.txt !== undefined && data.txt !== null) {
       var result = "";
       var n = "";
@@ -144,15 +156,15 @@ function iChatPlugin(name, parser, ...otherInfo) {
     data.txt = result;
     return data;
   }, desc);
-  var italics = new iChatPlugin("default/italics", function(data) {
+  var italics = new iChatPlugin("default/italics", function (data) {
     data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
     return data;
   }, desc);
-  var bold = new iChatPlugin("default/bold", function(data) {
+  var bold = new iChatPlugin("default/bold", function (data) {
     data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
   }, desc);
-  iChat.onload = function() {
+  iChat.onload = function () {
     iChat.registerPlugins(links, italics, bold);
   }
 })();

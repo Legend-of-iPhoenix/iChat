@@ -67,3 +67,11 @@ It is recommended to name plugins in the format `group_name/plugin_name`.
 - Plugin names should be short. Try not to create absurdly long names.
 - If your plugin does not come in a group, the name of the plugin should just be `plugin_name`.
 - Plugin names must be unique.
+
+## Removing plugins
+The Plugin API has a built-in way to remove plugins. You call `iChat.removePlugin(plugin_name)` to remove the plugin named `plugin_name`. The function returns the plugin that was removed.
+
+## Sending (fake) messages
+Plugins can send messages directly to the iChat user.
+
+The function `iChat.renderMessage(data)` accepts a JSON Object containing message data. The format for message data is described under the subheading "The parser". The message is **not** sent to the database. It will be shown like any other iChat message, except it will not be parsed by any other plugins. 
