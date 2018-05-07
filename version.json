@@ -1,4 +1,5 @@
 {
-	"version": "1.0.0",
-	"releaseDate": "05/05/18"
+	"version": "1.1.0",
+	"releaseDate": "05/07/18",
+	"releaseNotes": "Removed Google Analytics from iChat. I'm still not sure why I had it in there in the first place."
 }

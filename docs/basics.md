@@ -9,6 +9,3 @@ To send a message, you type the message into the input bar. Pressing enter sends
 
 ## Banning Users
 If you are using the default firebase rules, you can ban a user by adding their username to the keys in `/iChat/banned/`.
-
-## Disabling iChat Tracking
-iChat uses Google Analytics to see which sites are using it. We understand that this is a feature that many site owners will want to disable. To disable this, change `<script src="https://legend-of-iphoenix.github.io/iChat/js/iChat.min.js"></script>` in the HTML embed to `<script src="https://legend-of-iphoenix.github.io/iChat/js/iChat.min.js?notracking"></script>`.

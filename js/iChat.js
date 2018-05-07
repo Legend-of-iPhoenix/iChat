@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", x => {
     iChat = new function () {
       this.version = null;
       this.releaseDate = null;
+      this.releaseNotes = null;
       this.isLoaded = false;
       this.plugins = [];
       // Lists plugins. Exists mostly for debugging purposes, but it could be useful somehow.
@@ -71,22 +72,11 @@ document.addEventListener("DOMContentLoaded", x => {
       }).then(function (json) {
         iChat.version = json.version;
         iChat.releaseDate = json.releaseDate;
+        iChat.releaseNotes = json.releaseNotes;
         setTimeout(x => {
-          // This lets me see what sites are using iChat.
-          if ((document.querySelector('script[src$="/iChat/js/iChat.min.js?notracking"]') || document.querySelector('script[src$="/iChat/js/iChat.js?notracking"]')) === null) {
-            var iframe = document.createElement("iframe");
-            iframe.src = "https://legend-of-iphoenix.github.io/iChat/usage.html?" + location.href;
-            iframe.width = "1px";
-            iframe.height = "1px";
-            // For some reason, it doesn't like it if I call this method directly in a setTimeout, so we create a dummy function to call it instead.
-            var remove = x => iframe.remove();
-            document.body.appendChild(iframe);
-            setTimeout(remove, 1000);
-          }
-
           iChat.isLoaded = true;
           // modifying, blocking, or changing this notice is strictly prohibited.
-          console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + iChat.version + ", released on " + iChat.releaseDate + ". \nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
+          console.log("iChat loaded.\n© _iPhoenix_.\n\nVersion " + iChat.version + ", released on " + iChat.releaseDate + ". \nRelease notes: \n"+iChat.releaseNotes + "\nInterested in looking under the hood, or just want to poke around? Start here: http://bit.ly/iChat-Source");
           callbacks.forEach(callback => callback());
           // Parse new messages. Most of this code was shamelessly ripped from UniChat.
           firebase.database().ref('iChat').orderByChild('ts').limitToLast(15).on('child_added', function (snapshot) {
