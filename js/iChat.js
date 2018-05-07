@@ -4,9 +4,6 @@ var iChat = new function () {
   Object.defineProperty(this, 'onload', {
     set(f) {
       iChat.callbacks.push(f);
-    },
-    get() {
-      return iChat.callbacks;
     }
   });
 };
@@ -19,10 +16,18 @@ document.addEventListener("DOMContentLoaded", x => {
       this.releaseDate = null;
       this.isLoaded = false;
       this.plugins = [];
+      // Lists plugins. Exists mostly for debugging purposes, but it could be useful somehow.
+      this.listPlugins = function () {
+        console.group("iChat Plugin Listing");
+        iChat.plugins.forEach(function (plugin) {
+          console.log(plugin.name + ": " + plugin.otherInfo);
+        });
+        console.groupEnd();
+      }
       // documented in /docs/plugin-api.md
       this.registerPlugin = function (plugin) {
-        var parser = plugin.parser; 
-        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(otherPlugin => otherPlugin.name === plugin.name) && plugin.constructor === iChatPlugin) { // assert that the plugin has a parser that is a function that takes one argument, has a unique name, and was made using the iChatPlugin constructor.
+        var parser = plugin.parser;
+        if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(otherPlugin => otherPlugin.name === plugin.name) && plugin.constructor === iChatPlugin) { // assert that the plugin has a parser function that takes one argument, has a unique name, and was made using the iChatPlugin constructor.
           iChat.plugins.push(plugin)
         } else {
           throw new Error("Invalid iChat plugin!");
@@ -33,7 +38,7 @@ document.addEventListener("DOMContentLoaded", x => {
         plugins.forEach(plugin => iChat.registerPlugin(plugin));
       }
       // removes the plugin with a given name, returning the plugin that was removed.
-      this.removePlugin = function(name) {
+      this.removePlugin = function (name) {
         var removedPlugin = iChat.plugins.find(plugin => plugin.name == name);
         iChat.plugins = iChat.plugins.filter(plugin => plugin.name != name);
         return removedPlugin;
@@ -156,12 +161,12 @@ function iChatPlugin(name, parser, ...otherInfo) {
     data.txt = result;
     return data;
   }, desc);
-  // renders italics
+  // renders italicized text
   var italics = new iChatPlugin("default/italics", function (data) {
     data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
     return data;
   }, desc);
-  // renders bold
+  // renders bolded text
   var bold = new iChatPlugin("default/bold", function (data) {
     data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
