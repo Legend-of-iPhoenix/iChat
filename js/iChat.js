@@ -16,21 +16,21 @@ document.addEventListener("DOMContentLoaded", x => {
     var callbacks = iChat.callbacks;
     iChat = new function () {
       this.version = null;
+      this.releaseDate = null;
       this.isLoaded = false;
       this.plugins = [];
+      // documented in /docs/plugin-api.md
       this.registerPlugin = function (plugin) {
         var parser = plugin.parser; 
         if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(otherPlugin => otherPlugin.name === plugin.name) && plugin.constructor === iChatPlugin) { // assert that the plugin has a parser that is a function that takes one argument, has a unique name, and was made using the iChatPlugin constructor.
           iChat.plugins.push(plugin)
-        } // todo: create error message on plugin failure.
+        } else {
+          throw new Error("Invalid iChat plugin!");
+        }
       }
+      // documented in /docs/plugin-api.md
       this.registerPlugins = function (...plugins) {
-        plugins.forEach(function (plugin) {
-          var parser = plugin.parser;
-          if ((typeof parser == 'function') && parser.length === 1 && !iChat.plugins.find(otherPlugin => otherPlugin.name === plugin.name) && plugin.constructor === iChatPlugin) { // assert that the plugin has a parser that is a function that takes one argument, has a unique name, and was made using the iChatPlugin constructor.
-            iChat.plugins.push(plugin)
-          } // todo: create error message on plugin failure.
-        });
+        plugins.forEach(plugin => iChat.registerPlugin(plugin));
       }
       // removes the plugin with a given name, returning the plugin that was removed.
       this.removePlugin = function(name) {
@@ -156,10 +156,12 @@ function iChatPlugin(name, parser, ...otherInfo) {
     data.txt = result;
     return data;
   }, desc);
+  // renders italics
   var italics = new iChatPlugin("default/italics", function (data) {
     data.txt = data.txt.replace(/\~([^\~]*)\~/g, '<em style="display: inline-block;">$1</em>');
     return data;
   }, desc);
+  // renders bold
   var bold = new iChatPlugin("default/bold", function (data) {
     data.txt = data.txt.replace(/\*([^\~]*)\*/g, '<strong style="display: inline-block;">$1</strong>');
     return data;
