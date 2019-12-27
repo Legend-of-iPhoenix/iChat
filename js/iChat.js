@@ -15,6 +15,15 @@
  * http://bit.ly/iChat-Source 
  */
 
+/**
+ * @typedef {{
+ *   u: string,
+ *   ts: number,
+ *   txt: string
+ * }}
+ */
+var MessageData;
+
 class IChat {
   constructor() {
     this.version = null;
@@ -33,6 +42,9 @@ class IChat {
     }
   }
 
+  /**
+   * @param {function()} func
+   */
   set onload(func) {
     if (this.isLoaded) {
       func();
@@ -55,6 +67,7 @@ class IChat {
   /**
    * Registers a single plugin
    * documented in /docs/plugin-api.md
+   * @param {iChatPlugin} plugin
    */
   registerPlugin(plugin) {
     const parser = plugin.parser;
@@ -79,6 +92,7 @@ class IChat {
   /**
    * Registers multiple plugins.
    * documented in /docs/plugin-api.md
+   * @param {...iChatPlugin} plugins
    */
   registerPlugins(...plugins) {
     plugins.forEach(plugin => this.registerPlugin(plugin));
@@ -86,6 +100,7 @@ class IChat {
 
   /**
    * Removes the plugin with a given name and returns the plugin if it existed.
+   * @param {string} name
    */
   removePlugin(name) {
     const index = this.plugins.findIndex(plugin => plugin.name == name);
@@ -98,6 +113,8 @@ class IChat {
 
   /**
    * Renders a message, regardless of whether it was actually sent by a user.
+   * @param {MessageData} data
+   * @return {string}
    */
   renderMessage(data) {
     if (data["txt"]) {
@@ -105,6 +122,9 @@ class IChat {
       message.classList.add("iChat");
       message.classList.add("iChat-message");;
       message.style.margin = "0";
+
+      const id = "iChat-message-"  + (Math.random() + new Date().getTime()).toString(36);
+      message.id = id;
 
       if (data["ts"]) {
         const timestamp = document.createElement("span");
@@ -137,6 +157,35 @@ class IChat {
 
       const messagesDiv = document.getElementById("iChat-messages");
       messagesDiv.insertBefore(message, messagesDiv.firstChild);
+
+      return id;
+    }
+
+    return "";
+  }
+
+  /**
+   * Updates the text of a message, given the id.
+   * @param {string} id
+   * @param {MessageData} data
+   */
+  updateMessage(id, data) {
+    let message = document.getElementById(id);
+    if (message) {
+      if (data["ts"]) {
+        const timestamp = message.children[0];
+        timestamp.innerText = new Date(data["ts"]).toLocaleTimeString();
+      }
+
+      if (data["u"]) {
+        const username = message.children[1];
+        username.innerText = data["u"];
+      }
+
+      if (data["txt"]) {
+        const text = message.children[2];
+        text.innerText = data["txt"];
+      }
     }
   }
 
@@ -168,7 +217,11 @@ class IChat {
               data = plugin.parser(data);
             });
 
-            this.renderMessage(data);
+            this.renderMessage(/* @type {MessageData} */ ({
+              "u": data["u"],
+              "ts": data["ts"],
+              "txt": data["txt"]
+            }));
           });
         }, 500);
       });
@@ -190,6 +243,11 @@ class IChat {
     }
   }
 
+  /**
+   * Removes possibility of XSS
+   * @param {string} text
+   * @return {string}
+   */
   cleanse(text) {
     const element = document.createElement('p');
     element.innerText = text;
@@ -200,12 +258,25 @@ class IChat {
 
 const iChat = new IChat();
 window["iChat"] = iChat;
+
+// hack because stuff is dumb.
+Object.defineProperty(window["iChat"], 'onload', {
+  set(f) {
+    iChat.onload = f;
+  }
+});
+
 window["iChat"]["registerPlugin"] = iChat.registerPlugin;
 window["iChat"]["registerPlugins"] = iChat.registerPlugins;
-window["iChat"]["onload"] = iChat.onload;
 window["iChat"]["listPlugins"] = iChat.listPlugins;
+window["iChat"]["renderMessage"] = iChat.renderMessage;
+window["iChat"]["updateMessage"] = iChat.updateMessage;
 
 class iChatPlugin {
+  /**
+   * @param {string} name
+   * @param {function(MessageData): MessageData} parser
+   */
   constructor(name, parser, ...otherInfo) {
     this.name = name;
     this.parser = parser;
