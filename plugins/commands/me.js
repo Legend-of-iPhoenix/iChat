@@ -2,7 +2,7 @@
  * Adds /me command, which shows the user doing an action
  * ex. "/me runs" --> "*_iPhoenix_ runs"
  */
-var me = new iChatPlugin("action/me", function (data) {
+const me = new iChatPlugin("action/me", function (data) {
   if (data.txt.startsWith("/me ")) {
     data.txt = "*" + data.u + " " + data.txt.substring(4);
     data.u = false;

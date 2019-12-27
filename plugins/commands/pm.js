@@ -2,9 +2,9 @@
  * Adds /pm command, which lets user send semi-private messages to eachother.
  * Syntax: /pm <user> <message>, where <user> is the recipient of the PM.
  */
-var pm = new iChatPlugin("action/pm", function (data) {
+const pm = new iChatPlugin("action/pm", function (data) {
   if (data.txt.startsWith("/pm ")) {
-    var recipient = data.txt.match(/(\S+)/g)[1];
+    let recipient = data.txt.match(/(\S+)/g)[1];
     if (data.u === firebase.auth().currentUser.displayName) {
       data.u = "[ You => " + recipient + "]";
       data.txt = data.txt.substring(4 + recipient.length);
