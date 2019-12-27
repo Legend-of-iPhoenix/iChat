@@ -139,7 +139,7 @@ class IChat {
         const username = document.createElement("span");
         username.classList.add("iChat");
         username.classList.add("iChat-username");;
-        username.innerText = data["u"];
+        username.innerHTML = data["u"];
 
         message.appendChild(username);
       }
@@ -147,7 +147,7 @@ class IChat {
       const text = document.createElement("span");
       text.classList.add("iChat");
       text.classList.add("iChat-text");;
-      text.innerText = data["txt"];
+      text.innerHTML = data["txt"];
 
       message.appendChild(text);
 
@@ -179,12 +179,12 @@ class IChat {
 
       if (data["u"]) {
         const username = message.children[1];
-        username.innerText = data["u"];
+        username.innerHTML = data["u"];
       }
 
       if (data["txt"]) {
         const text = message.children[2];
-        text.innerText = data["txt"];
+        text.innerHTML = data["txt"];
       }
     }
   }
